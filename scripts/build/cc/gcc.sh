@@ -389,6 +389,11 @@ do_gcc_core_backend() {
         extra_config+=(--disable-libquadmath-support)
     fi
 
+    case "${CT_CC_GCC_LIBSTDCXX_VERBOSE}" in
+        y)  extra_config+=("--enable-libstdcxx-verbose");;
+        "") extra_config+=("--disable-libstdcxx-verbose");;
+    esac
+
     core_LDFLAGS+=("${ldflags}")
 
     # *** WARNING ! ***
@@ -973,6 +978,11 @@ do_gcc_backend() {
             extra_config+=(--disable-libmpx)
         fi
     fi
+
+    case "${CT_CC_GCC_LIBSTDCXX_VERBOSE}" in
+        y)  extra_config+=("--enable-libstdcxx-verbose");;
+        "") extra_config+=("--disable-libstdcxx-verbose");;
+    esac
 
     final_LDFLAGS+=("${ldflags}")
 

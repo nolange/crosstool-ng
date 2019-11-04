@@ -29,7 +29,6 @@ do_finish() {
     local _t
     local _type
     local strip_args
-    local gcc_version
     local exe_suffix
 
     CT_DoStep INFO "Finalizing the toolchain's directory"
@@ -73,11 +72,10 @@ do_finish() {
             # We can not use the version in CT_GCC_VERSION because
             # of the Linaro stuff. So, harvest the version string
             # directly from the gcc sources...
-            gcc_version=$( cat "${CT_SRC_DIR}/gcc/gcc/BASE-VER" )
-            for _t in "bin/${CT_TARGET}-"*                                      \
-                      "${CT_TARGET}/bin/"*                                      \
-                      "libexec/gcc/${CT_TARGET}/${gcc_version}/"*               \
-                      "libexec/gcc/${CT_TARGET}/${gcc_version}/install-tools/"* \
+            for _t in "bin/${CT_TARGET}-"*     \
+                      "${CT_TARGET}/bin/"*     \
+                      "${CT_GccLibexecDir}/"*  \
+                      "${CT_GccItoolsDir}/"*   \
             ; do
                 _type="$( file "${_t}" |cut -d ' ' -f 2- )"
                 case "${_type}" in

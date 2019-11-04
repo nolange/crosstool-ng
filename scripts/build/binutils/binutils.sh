@@ -214,7 +214,22 @@ do_binutils_backend() {
     if [ "${CT_BINUTILS_PLUGINS}" = "y" ]; then
         # Create a directory for plugins such as LTO (to be installed by
         # their providers later)
-        CT_DoExecLog ALL mkdir -p "${CT_PREFIX_DIR}/lib/bfd-plugins"
+        # Readout libdir (correctly used since V2.33 only), and the legacy
+        # path
+        CT_BinutilsPluginDirs=$(make -s --no-print-directory -f Makefile \
+            -f "${CT_LIB_DIR}/scripts/printvar_fragment.make" apvar-libdir)
+        CT_BinutilsPluginDirs="${CT_BinutilsPluginDirs}/bfd-plugins"
+        CT_BinutilsPluginLegacy=$(make -s --no-print-directory -f Makefile \
+            -f "${CT_LIB_DIR}/scripts/printvar_fragment.make" \
+            injvar='$(bindir)/../lib/bfd-plugins' apvar-injvar)
+
+        CT_DoExecLog ALL mkdir -p "${CT_BinutilsPluginDirs}" \
+            "${CT_BinutilsPluginLegacy}"
+
+        [ "${CT_BinutilsPluginDirs}" = "${CT_BinutilsPluginLegacy}" ] ||
+            CT_BinutilsPluginDirs="${CT_BinutilsPluginDirs}:${CT_BinutilsPluginLegacy}"
+
+        CT_EnvModify CT_BinutilsPluginDirs "${CT_BinutilsPluginDirs}"
     fi
 
     if [ "${build_manuals}" = "y" ]; then

@@ -284,6 +284,7 @@ do_cc_core_pass_2() {
 # Usage: do_gcc_core_backend mode=[static|shared|baremetal] build_libgcc=[yes|no] build_staticlinked=[yes|no]
 do_gcc_core_backend() {
     local mode
+    local build_final=no
     local build_libgcc=no
     local build_libstdcxx=no
     local build_libgfortran=no
@@ -321,6 +322,7 @@ do_gcc_core_backend() {
             ;;
         gcc_build|gcc_host)
             CT_DoLog EXTRA "Configuring final gcc compiler"
+            build_final=yes
             extra_config+=( "${CT_CC_SYSROOT_ARG[@]}" )
             extra_user_config=( "${CT_CC_GCC_EXTRA_CONFIG_ARRAY[@]}" )
             log_txt="final gcc compiler"
@@ -699,6 +701,18 @@ do_gcc_core_backend() {
     CT_DoLog EXTRA "Installing ${log_txt}"
     CT_DoExecLog ALL make ${core_targets_install}
 
+    if [ "${build_final}" = "yes" ]; then
+        local evalout
+        local itoolsdir
+        local libexecsubdir
+        evalout=$(make -s --no-print-directory -f gcc/Makefile \
+            -f "${CT_LIB_DIR}/scripts/printvar_fragment.make" \
+            apvar_sh-itoolsdir apvar_sh-libexecsubdir)
+        eval "${evalout}"
+        CT_EnvModify CT_GccLibexecDir "${libexecsubdir}"
+        CT_EnvModify CT_GccItoolsDir "${itoolsdir}"
+    fi
+
     # Remove the libtool "pseudo-libraries": having them in the installed
     # tree makes the libtoolized utilities that are built next assume
     # that, for example, libsupc++ is an "accessory library", and not include
@@ -728,10 +742,15 @@ do_gcc_core_backend() {
         host="${host}"
 
     # If binutils want the LTO plugin, point them to it
-    if [ -d "${CT_PREFIX_DIR}/lib/bfd-plugins" -a "${build_step}" = "gcc_host" ]; then
-        local gcc_version=$(cat "${CT_SRC_DIR}/gcc/gcc/BASE-VER" )
-        CT_DoExecLog ALL ln -sfv "../../libexec/gcc/${CT_TARGET}/${gcc_version}/liblto_plugin.so" \
-                "${CT_PREFIX_DIR}/lib/bfd-plugins/liblto_plugin.so"
+    if [ -n "${CT_GccLibexecDir}" -a -n "${CT_BinutilsPluginDirs}" -a "${build_step}" = "gcc_host" ]; then
+        (
+            IFS=:
+            for plugpath in ${CT_BinutilsPluginDirs}; do
+                rellinkpath=$(realpath -s -m --relative-to="${plugpath}" "${CT_GccLibexecDir}")
+                CT_DoExecLog ALL ln -sfv "${rellinkpath}/liblto_plugin.so" \
+                        "${plugpath}/liblto_plugin.so"
+            done
+        )
     fi
 }
 
@@ -1193,6 +1212,16 @@ do_gcc_backend() {
         CT_DoExecLog ALL make install
     fi
 
+    local evalout
+    local itoolsdir
+    local libexecsubdir
+    evalout=$(make -s --no-print-directory -f gcc/Makefile \
+        -f "${CT_LIB_DIR}/scripts/printvar_fragment.make" \
+        apvar_sh-itoolsdir apvar_sh-libexecsubdir)
+    eval "${evalout}"
+    CT_EnvModify CT_GccLibexecDir "${libexecsubdir}"
+    CT_EnvModify CT_GccItoolsDir "${itoolsdir}"
+
     # Remove the libtool "pseudo-libraries": having them in the installed
     # tree makes the libtoolized utilities that are built next assume
     # that, for example, libsupc++ is an "accessory library", and not include
@@ -1222,9 +1251,14 @@ do_gcc_backend() {
         host="${host}"
 
     # If binutils want the LTO plugin, point them to it
-    if [ -d "${CT_PREFIX_DIR}/lib/bfd-plugins" -a "${build_step}" = "gcc_host" ]; then
-        local gcc_version=$(cat "${CT_SRC_DIR}/gcc/gcc/BASE-VER" )
-        CT_DoExecLog ALL ln -sfv "../../libexec/gcc/${CT_TARGET}/${gcc_version}/liblto_plugin.so" \
-                "${CT_PREFIX_DIR}/lib/bfd-plugins/liblto_plugin.so"
+    if [ -n "${CT_GccLibexecDir}" -a -n "${CT_BinutilsPluginDirs}" -a "${build_step}" = "gcc_host" ]; then
+        (
+            IFS=:
+            for plugpath in ${CT_BinutilsPluginDirs}; do
+                rellinkpath=$(realpath -s -m --relative-to="${plugpath}" "${CT_GccLibexecDir}")
+                CT_DoExecLog ALL ln -sfv "${rellinkpath}/liblto_plugin.so" \
+                        "${plugpath}/liblto_plugin.so"
+            done
+        )
     fi
 }

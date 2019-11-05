@@ -119,6 +119,34 @@ do_finish() {
         CT_DoExecLog ALL chmod 755 "${CT_PREFIX_DIR}/bin/${CT_TARGET}-ldd"
     fi
 
+    if true; then
+        CT_DoLog EXTRA "Installing buildsystem toolchain files (CMake)"
+        local scriptfile
+        local scriptsubdir
+        scriptsubdir=/share
+        scriptfile="${CT_LIB_DIR}/scripts/support/toolchainfile.cmake-${CT_CC}.sh"
+        [ -r "$scriptfile" ] || scriptfile="${CT_LIB_DIR}/scripts/support/toolchainfile.cmake.sh"
+        (
+          . "$scriptfile"
+        )  > "${CT_PREFIX_DIR}/${scriptsubdir}/${CT_TARGET}-toolchainfile.cmake"
+
+        CT_DoLog EXTRA "Installing buildsystem toolchain files (Meson)"
+        scriptsubdir=/share
+        scriptfile="${CT_LIB_DIR}/scripts/support/cross-compilation.conf-${CT_CC}.sh"
+        [ -r "$scriptfile" ] || scriptfile="${CT_LIB_DIR}/scripts/support/cross-compilation.conf.sh"
+        (
+          . "$scriptfile"
+        )  > "${CT_PREFIX_DIR}/${scriptsubdir}/${CT_TARGET}-cross-compilation.conf"
+
+        CT_DoLog EXTRA "Installing GDB support files"
+        scriptsubdir=/share
+        scriptfile="${CT_LIB_DIR}/scripts/support/gdbinit-${CT_CC}.sh"
+        [ -r "$scriptfile" ] || scriptfile="${CT_LIB_DIR}/scripts/support/gdbinit.sh"
+        (
+          . "$scriptfile"
+        )  > "${CT_PREFIX_DIR}/${scriptsubdir}/${CT_TARGET}-gdbinit"
+    fi
+
     # Create the aliases to the target tools
     CT_DoLog EXTRA "Creating toolchain aliases"
     CT_SymlinkTools "${CT_PREFIX_DIR}/bin" "${CT_PREFIX_DIR}/bin" \

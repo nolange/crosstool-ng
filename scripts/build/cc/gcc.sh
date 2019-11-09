@@ -602,6 +602,7 @@ do_gcc_core_backend() {
         --host=${host}                                 \
         --target=${CT_TARGET}                          \
         --prefix="${prefix}"                           \
+        --libexecdir="\$(exec_prefix)/lib"             \
         --with-local-prefix="${CT_SYSROOT_DIR}"        \
         "${extra_config[@]}"                           \
         --enable-languages="${lang_list}"              \
@@ -1190,6 +1191,7 @@ do_gcc_backend() {
         --host=${host}                                 \
         --target=${CT_TARGET}                          \
         --prefix="${prefix}"                           \
+        --libexecdir="\$(exec_prefix)/lib"             \
         ${CT_CC_SYSROOT_ARG}                           \
         "${extra_config[@]}"                           \
         --with-local-prefix="${CT_SYSROOT_DIR}"        \

@@ -193,6 +193,7 @@ do_binutils_backend() {
         --host=${host}                                          \
         --target=${CT_TARGET}                                   \
         --prefix=${prefix}                                      \
+        --libdir="\$(exec_prefix)/lib/${CT_TARGET}"             \
         --disable-werror                                        \
         "${extra_config[@]}"                                    \
         ${CT_ARCH_WITH_FLOAT}                                   \
@@ -359,6 +360,7 @@ do_binutils_for_target() {
             --host=${CT_TARGET}                                     \
             --target=${CT_TARGET}                                   \
             --prefix=/usr                                           \
+            --libdir="\$(exec_prefix)/lib/${CT_TARGET}"             \
             --disable-werror                                        \
             --enable-shared                                         \
             --enable-static                                         \

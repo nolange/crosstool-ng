@@ -746,7 +746,7 @@ do_gcc_core_backend() {
         (
             IFS=:
             for plugpath in ${CT_BinutilsPluginDirs}; do
-                rellinkpath=$(realpath -s -m --relative-to="${plugpath}" "${CT_GccLibexecDir}")
+                rellinkpath=$(CT_RelativePath "${plugpath}" "${CT_GccLibexecDir}")
                 CT_DoExecLog ALL ln -sfv "${rellinkpath}/liblto_plugin.so" \
                         "${plugpath}/liblto_plugin.so"
             done
@@ -1255,7 +1255,7 @@ do_gcc_backend() {
         (
             IFS=:
             for plugpath in ${CT_BinutilsPluginDirs}; do
-                rellinkpath=$(realpath -s -m --relative-to="${plugpath}" "${CT_GccLibexecDir}")
+                rellinkpath=$(CT_RelativePath "${plugpath}" "${CT_GccLibexecDir}")
                 CT_DoExecLog ALL ln -sfv "${rellinkpath}/liblto_plugin.so" \
                         "${plugpath}/liblto_plugin.so"
             done

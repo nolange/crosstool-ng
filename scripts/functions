@@ -480,6 +480,35 @@ CT_SanitizeVarDir() {
     done
 }
 
+# Convert absolute paths to relatives of a base directory
+#
+# Usage: CT_RelativePath BASEPATH ABSPATH...
+CT_RelativePath() {
+    # use known shared prefix to eliminate alot corners
+    local source="./$1"
+    local common_part
+    local target
+    local result
+
+    shift
+
+    for target; do
+        common_part=$source
+        target="./$target"
+        result=
+        while [ "${target#$common_part}" = "${target}" ]; do
+            common_part=${common_part%/*}
+            result="${result}../"
+        done
+
+        target=${target#$common_part}
+        # if result is empty, then need eliminate the leading slash
+        [ -n "$result" ] || target=${target#/}
+
+        printf -- '%s\n' "${result%/}${target}"
+    done
+}
+
 # Abort the execution with an error message
 # Usage: CT_Abort <message>
 CT_Abort() {

@@ -271,6 +271,7 @@ glibc_backend_once()
     "${CONFIG_SHELL}"                                               \
     "${src_dir}/configure"                                          \
         --prefix=/usr                                               \
+        --libexecdir="\$(exec_prefix)/lib"                          \
         --build=${CT_BUILD}                                         \
         --host=${multi_target}                                      \
         --cache-file="$(pwd)/config.cache"                          \
@@ -540,6 +541,7 @@ glibc_locales()
     ${CONFIG_SHELL}                        \
     "${src_dir}/configure"                 \
         --prefix=/usr                      \
+        --libexecdir="\$(exec_prefix)/lib" \
         --cache-file="$(pwd)/config.cache" \
         --without-cvs                      \
         --disable-profile                  \

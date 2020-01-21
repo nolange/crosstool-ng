@@ -606,6 +606,7 @@ do_gcc_core_backend() {
         --with-local-prefix="${CT_SYSROOT_DIR}"        \
         "${extra_config[@]}"                           \
         --enable-languages="${lang_list}"              \
+        --with-gcc-major-version-only                  \
         "${extra_user_config[@]}"
 
     if [ "${build_libgcc}" = "yes" ]; then
@@ -1195,6 +1196,7 @@ do_gcc_backend() {
         ${CT_CC_SYSROOT_ARG}                           \
         "${extra_config[@]}"                           \
         --with-local-prefix="${CT_SYSROOT_DIR}"        \
+        --with-gcc-major-version-only                  \
         --enable-long-long                             \
         "${CT_CC_GCC_EXTRA_CONFIG_ARRAY[@]}"
 

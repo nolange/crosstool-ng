@@ -7,4 +7,6 @@ EOF
 fi
 cat << EOF
 set sysroot ${CT_SYSROOT_DIR}
+# set sysroot target:
+# set debug-file-directory ${CT_SYSROOT_DIR}/lib/debug
 EOF
